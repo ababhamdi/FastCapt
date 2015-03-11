@@ -34,7 +34,7 @@
     </Style>
     
     <ControlTemplate x:Key="RecordControlTemplate" TargetType="Button">
-        <Border BorderBrush="Red"
+        <Border BorderBrush="{TemplateBinding Background}"
                 BorderThickness="1"
                 SnapsToDevicePixels="True"
                 CornerRadius="3"
@@ -46,8 +46,9 @@
                    Height="48" />
         </Border>
     </ControlTemplate>
+    
     <ControlTemplate x:Key="PauseControlTemplate" TargetType="Button">
-        <Border BorderBrush="Red"
+        <Border BorderBrush="{TemplateBinding Background}"
                 BorderThickness="1"
                 SnapsToDevicePixels="True"
                 CornerRadius="3"
@@ -61,12 +62,12 @@
                     <ColumnDefinition Width="4" />
                     <ColumnDefinition />
                 </Grid.ColumnDefinitions>
-                <Border Background="Red"
+                <Border Background="{TemplateBinding Background}"
                         CornerRadius="3"
                         Margin="0,0,5,0"
                         Grid.Column="0"/>
 
-                <Border Background="Red"
+                <Border Background="{TemplateBinding Background}"
                         CornerRadius="3"
                         Margin="5,0,0,0"
                         Grid.Column="2"/>
@@ -75,7 +76,7 @@
     </ControlTemplate>
 
     <ControlTemplate x:Key="ResumeControlTemplate" TargetType="Button">
-        <Border BorderBrush="Red"
+        <Border BorderBrush="{TemplateBinding Background}"
                 BorderThickness="1"
                 SnapsToDevicePixels="True"
                 CornerRadius="3"
@@ -89,14 +90,14 @@
                     <ColumnDefinition Width="4" />
                     <ColumnDefinition />
                 </Grid.ColumnDefinitions>
-                <Border Background="Red"
+                <Border Background="{TemplateBinding Background}"
                         CornerRadius="3"
                         Margin="0,0,5,0"
                         Grid.Column="0"/>
 
                 <Path Margin="5,0,0,0"
                       SnapsToDevicePixels="True"
-                      Fill="Red"
+                      Fill="{TemplateBinding Background}"
                       Data="{StaticResource RightArrow}"
                       VerticalAlignment="Center"
                       Grid.Column="2"/>
@@ -108,8 +109,44 @@
         <Setter Property="Cursor" Value="Hand" />
         <Setter Property="Width" Value="80" />
         <Setter Property="Height" Value="80" />
+        <Setter Property="Background" Value="Red" />
+        <Style.Triggers>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Background" Value="#8F8F90" />
+            </Trigger>
+        </Style.Triggers>
     </Style>
     
+    <!-- Screen area button style -->
+    <Style x:Key="ScreenAreaButtonStyle" TargetType="Button">
+        <Setter Property="OverridesDefaultStyle" Value="True" />
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Grid>
+                        <Rectangle SnapsToDevicePixels="True"
+                                   Fill="Black"
+                                   StrokeThickness="1"
+                                   StrokeDashArray="8,2"
+                                   Stroke="White" />
+                        <ContentPresenter VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                          HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" />
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Opacity" Value="0.5" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
     
     <!-- Main Window Style -->
     <Style x:Key="TitleBarButtonStyle" TargetType="Button">

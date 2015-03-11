@@ -18,6 +18,7 @@ namespace FastCapt.ViewModels
         private bool _isRecordingPaused;
         private TimeSpan _recordingDuration;
         private DispatcherTimer _durationTimer;
+        private ICommand _selectRecordingArea;
 
         #endregion
 
@@ -44,8 +45,10 @@ namespace FastCapt.ViewModels
                     _stopRecordingCommand = new RelayCommand(o =>
                     {
                         StopDurationTimer();
-                        IsRecordingPaused = IsRecording = false;
-                    });
+                        IsRecordingPaused = IsRecording = IsRecordingAreaSelected = false;
+
+                    },
+                    o => IsRecordingAreaSelected && (IsRecording || IsRecordingPaused));
                 }
 
                 return _stopRecordingCommand;
@@ -62,7 +65,8 @@ namespace FastCapt.ViewModels
                     {
                         StartDurationTimer();
                         IsRecording = true;
-                    });
+                    },
+                    o => IsRecordingAreaSelected );
                 }
 
                 return _startRecordingCommand;
@@ -82,6 +86,27 @@ namespace FastCapt.ViewModels
                     });
                 }
                 return _pauseRecordingCommand;
+            }
+        }
+
+        public ICommand SelectRecordingAreaCommand
+        {
+            get
+            {
+                if (_selectRecordingArea == null)
+                {
+                    _selectRecordingArea = new RelayCommand(
+                        o =>
+                        {
+                            IsRecordingAreaSelected = true;
+                        },
+                        o =>
+                        {
+                            // you can select again, if you're recording or paused.
+                            return !(IsRecording || IsRecordingPaused);
+                        });
+                }
+                return _selectRecordingArea;
             }
         }
 
