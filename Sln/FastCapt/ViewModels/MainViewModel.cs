@@ -2,6 +2,7 @@
 using System.Windows.Input;
 using System.Windows.Threading;
 using FastCapt.Core;
+using FastCapt.Services;
 
 namespace FastCapt.ViewModels
 {
@@ -98,7 +99,12 @@ namespace FastCapt.ViewModels
                     _selectRecordingArea = new RelayCommand(
                         o =>
                         {
-                            IsRecordingAreaSelected = true;
+                            var selectionService = new ScreenSelectorService();
+                            var result = selectionService.SelectArea();
+                            if (result)
+                            {
+                                IsRecordingAreaSelected = true;
+                            }
                         },
                         o =>
                         {

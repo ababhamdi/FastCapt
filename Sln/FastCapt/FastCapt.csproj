@@ -36,9 +36,17 @@
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject>FastCapt.Program</StartupObject>
+  </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.Expression.Interactions, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Windows.Interactivity, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -56,11 +64,56 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="ApplicationModel\IApplication.cs" />
+    <Compile Include="ApplicationModel\FastCaptApplication.cs" />
+    <Compile Include="Controls\AreaAdorner.xaml.cs">
+      <DependentUpon>AreaAdorner.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\Core\BooleanBoxes.cs" />
+    <Compile Include="Controls\Core\RoutedEventHelper.cs" />
+    <Compile Include="Controls\DimensionsView.xaml.cs">
+      <DependentUpon>DimensionsView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\Dock.cs" />
+    <Compile Include="Controls\SelectionShadow.xaml.cs">
+      <DependentUpon>SelectionShadow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Controls\WindowCommands.cs" />
+    <Compile Include="Converters\InvertedBooleanToVisibilityConverter.cs" />
     <Compile Include="Converters\InvertedBooleanConverter.cs" />
     <Compile Include="Core\RelayCommand.cs" />
     <Compile Include="Core\ObservableObject.cs" />
+    <Compile Include="Interop\CURSORINFO.cs" />
+    <Compile Include="Interop\CursorState.cs" />
+    <Compile Include="Interop\DrawingFlags.cs" />
+    <Compile Include="Interop\ICONINFO.cs" />
+    <Compile Include="Interop\POINT.cs" />
+    <Compile Include="Interop\RECT.cs" />
+    <Compile Include="Interop\SW.cs" />
+    <Compile Include="Interop\SWP.cs" />
+    <Compile Include="Interop\TernaryRasterOperations.cs" />
+    <Compile Include="Interop\Win32.cs" />
+    <Compile Include="Interop\GWL.cs" />
+    <Compile Include="Interop\WINDOWPLACEMENT.cs" />
+    <Compile Include="Interop\WS_EX.cs" />
+    <Compile Include="Interop\WS.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="Services\Interfaces\IService.cs" />
+    <Compile Include="Services\Interfaces\IStartupService.cs" />
+    <Compile Include="Services\ScreenSelector.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
+    <Page Include="Controls\AreaAdorner.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\DimensionsView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\SelectionShadow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Resources\Shared.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -110,6 +163,7 @@
   <ItemGroup>
     <Resource Include="Resources\Images\record_screen.png" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
