@@ -2,6 +2,8 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
+using System.Windows.Forms;
+using System.Windows.Input;
 using System.Windows.Interop;
 using FastCapt.Controls.Core;
 
@@ -172,14 +174,44 @@ namespace FastCapt.Controls
 
             if (!handled)
             {
-                rect.X += horizontalChange;
-                rect.Y += verticalChange;
+                // ensure the area adorner is correctly placed in the monitor boundary.
+                var mousePos = Mouse.GetPosition(null);
+                var currentScreen = Screen.FromPoint(new System.Drawing.Point((int)mousePos.X, (int)mousePos.Y));
+                var screenBounds = currentScreen.Bounds;
 
                 var top = Canvas.GetTop(this);
-                var left = Canvas.GetLeft(this);
+                var newTop = top+verticalChange;
 
-                Canvas.SetTop(this, top + verticalChange);
-                Canvas.SetLeft(this, left + horizontalChange);
+                if (newTop < screenBounds.Top)
+                    newTop = screenBounds.Top;
+                else if ((newTop + rect.Height) > screenBounds.Bottom)
+                    newTop = screenBounds.Bottom - rect.Height;
+                Canvas.SetTop(this, newTop);
+
+                // check the left side of the rect
+                var left = Canvas.GetLeft(this);
+                var newLeft = left + horizontalChange;
+                if (newLeft < screenBounds.Left)
+                    newLeft = screenBounds.Left;
+                else if ((newLeft + rect.Width) > screenBounds.Right)
+                    newLeft = screenBounds.Right - rect.Width;
+                Canvas.SetLeft(this, newLeft);
+
+                // check the right edge of the screen
+                var newX = rect.X + horizontalChange;
+                if (newX < screenBounds.Left)
+                    newX = screenBounds.Left;
+                else if ((newX + rect.Width) > screenBounds.Right)
+                    newX = screenBounds.Right - rect.Width;
+                rect.X = newX;
+
+                // check the bottom of the screen.
+                var newY = rect.Y + verticalChange;
+                if (newY < screenBounds.Top)
+                    newY = screenBounds.Top;
+                else if ((newY + rect.Height) > screenBounds.Height)
+                    newY = screenBounds.Height - rect.Height;
+                rect.Y = newY;
             }
 
             RecordingRect = rect;

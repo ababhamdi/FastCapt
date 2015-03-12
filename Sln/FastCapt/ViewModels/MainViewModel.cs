@@ -3,6 +3,7 @@ using System.Windows.Input;
 using System.Windows.Threading;
 using FastCapt.Core;
 using FastCapt.Services;
+using FastCapt.Services.Interfaces;
 
 namespace FastCapt.ViewModels
 {
@@ -20,6 +21,7 @@ namespace FastCapt.ViewModels
         private TimeSpan _recordingDuration;
         private DispatcherTimer _durationTimer;
         private ICommand _selectRecordingArea;
+        private IScreenSelectorService _screenSelectorService;
 
         #endregion
 

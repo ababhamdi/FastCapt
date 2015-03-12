@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel.Composition;
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
@@ -16,11 +17,7 @@ using KeyEventArgs = System.Windows.Input.KeyEventArgs;
 
 namespace FastCapt.Services
 {
-    public interface IScreenSelectorService : IStartupService
-    {
-        bool SelectArea();
-    }
-
+    [Export(typeof(IScreenSelectorService))]
     public class ScreenSelectorService : ObservableObject, IScreenSelectorService
     {
         #region "Fields"
@@ -30,6 +27,7 @@ namespace FastCapt.Services
         private Rect _recordingArea;
 
         private const int AREA_ADORNER_PADDING = 5;
+        private Size MINIMUM_SIZE_REQUIRED = new Size(200, 200);
 
         private IntPtr _selectorHwnd;
         private IntPtr _adornerHwnd;
@@ -119,6 +117,8 @@ namespace FastCapt.Services
             var width = activeScreen.Bounds.Width;
             var height = activeScreen.Bounds.Height;
 
+            EnsureMinimumRequiredSize();
+
             var parameters = new HwndSourceParameters("AreaAdorner",
                 width,
                 height)
@@ -138,6 +138,24 @@ namespace FastCapt.Services
             Win32.ShowWindow(areaAdornerHwndSource.Handle, (int)SW.SHOW);
             DismissModalFrame();
             _isAreaSelected = true;
+        }
+
+        /// <summary>
+        /// A method that will check the size selected by the user, and adjust it to meet
+        /// the <see cref="MINIMUM_SIZE_REQUIRED"/> for the application.
+        /// </summary>
+        private void EnsureMinimumRequiredSize()
+        {
+            double newWidth = RecordingArea.Width;
+            double newHeight = RecordingArea.Height;
+
+            if (RecordingArea.Width < MINIMUM_SIZE_REQUIRED.Width)
+                newWidth = MINIMUM_SIZE_REQUIRED.Width;
+
+            if (RecordingArea.Height < MINIMUM_SIZE_REQUIRED.Height)
+                newHeight = MINIMUM_SIZE_REQUIRED.Height;
+
+            RecordingArea = new Rect(RecordingArea.Left, RecordingArea.Top, newWidth, newHeight);
         }
 
         private void DismissModalFrame()

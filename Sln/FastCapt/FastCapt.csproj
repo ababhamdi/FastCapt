@@ -100,7 +100,8 @@
     <Compile Include="Program.cs" />
     <Compile Include="Services\Interfaces\IService.cs" />
     <Compile Include="Services\Interfaces\IStartupService.cs" />
-    <Compile Include="Services\ScreenSelector.cs" />
+    <Compile Include="Services\Interfaces\IScreenSelectorService.cs" />
+    <Compile Include="Services\ScreenSelectorService.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
     <Page Include="Controls\AreaAdorner.xaml">
       <SubType>Designer</SubType>
@@ -111,6 +112,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Controls\SelectionShadow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Resources\Brushes.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

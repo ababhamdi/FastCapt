@@ -9,35 +9,48 @@
              d:DesignHeight="300"
              d:DesignWidth="300">
     <UserControl.Resources>
-        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
-        <converters:InvertedBooleanToVisibilityConverter x:Key="InvertedBooleanToVisibilityConverter" />
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="../Resources/Brushes.xaml" />
+            </ResourceDictionary.MergedDictionaries>
 
+            <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+            <converters:InvertedBooleanToVisibilityConverter x:Key="InvertedBooleanToVisibilityConverter" />
 
-        <SolidColorBrush x:Key="ThumBrush" Color="Red" />
+            <Style x:Key="DragOverThumbStyle" TargetType="Thumb">
+                <Setter Property="OverridesDefaultStyle" Value="True" />
+                <Setter Property="Width" Value="24" />
+                <Setter Property="Height" Value="24" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Thumb">
+                            <Border Background="{StaticResource TransparentBrush}"
+                                    SnapsToDevicePixels="True">
+                                <Path Fill="#FF000000" Stretch="Uniform" SnapsToDevicePixels="True">
+                                    <Path.Data>
+                                        <PathGeometry FillRule="Nonzero"
+                                                  Figures="M415.51,209.562L415.51,232.341 379.03,232.341 379.03,279.741 415.509,279.741 415.509,302.52 462,256.042 415.51,209.562z M96.49,302.521L96.49,279.742 132.969,279.742 132.969,232.342 96.49,232.342 96.49,209.563 50,256.04 96.49,302.521z M209.521,117.616L232.3,117.616 232.3,154.095 279.7,154.095 279.7,117.616 302.479,117.616 256,71.126 209.521,117.616z M302.479,394.384L279.7,394.384 279.7,357.905 232.3,357.905 232.3,394.384 209.521,394.384 256,440.874 302.479,394.384z M163.006,184.138L163.006,327.943 348.994,327.943 348.994,184.138 163.006,184.138z" />
+                                    </Path.Data>
+                                </Path>
+                            </Border>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
 
-        <Style x:Key="ResizeThumb" TargetType="Thumb">
-            <Setter Property="OverridesDefaultStyle" Value="True" />
-            <Setter Property="Width" Value="8" />
-            <Setter Property="Height" Value="8" />
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Thumb">
-                        <Rectangle Stroke="#6181FD" StrokeThickness="1" Fill="White" />
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-
-        <Style x:Key="DragOverThumbStyle" TargetType="Thumb">
-            <Setter Property="OverridesDefaultStyle" Value="True" />
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Thumb">
-
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
+            <Style x:Key="ResizeThumb" TargetType="Thumb">
+                <Setter Property="OverridesDefaultStyle" Value="True" />
+                <Setter Property="Width" Value="8" />
+                <Setter Property="Height" Value="8" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Thumb">
+                            <Rectangle Stroke="#6181FD" StrokeThickness="1" Fill="White" />
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+        </ResourceDictionary>
     </UserControl.Resources>
     <Grid x:Name="RootGrid" Background="Transparent">
         <Rectangle x:Name="Border"
@@ -112,8 +125,7 @@
                                     Converter={StaticResource InvertedBooleanToVisibilityConverter}}"
                Tag="{x:Static lc:Dock.None}"
                Cursor="SizeAll"
-               Width="24"
-               Height="24"
+               Style="{StaticResource DragOverThumbStyle}"
                x:Name="MiddleThumb"/>
 
         <lc:DimensionsView VerticalAlignment="Center"
@@ -122,6 +134,5 @@
                                                    Path=IsResizing,
                                                    Converter={StaticResource BooleanToVisibilityConverter}}"
                               DataContext="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=lc:AreaAdorner}, Path=RecordingRect}"/>
-        
-        </Grid>
+    </Grid>
 </UserControl>
