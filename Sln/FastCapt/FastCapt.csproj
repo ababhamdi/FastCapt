@@ -83,18 +83,9 @@
     <Compile Include="Converters\InvertedBooleanConverter.cs" />
     <Compile Include="Core\RelayCommand.cs" />
     <Compile Include="Core\ObservableObject.cs" />
-    <Compile Include="Interop\CURSORINFO.cs" />
-    <Compile Include="Interop\CursorState.cs" />
-    <Compile Include="Interop\DrawingFlags.cs" />
-    <Compile Include="Interop\ICONINFO.cs" />
-    <Compile Include="Interop\POINT.cs" />
-    <Compile Include="Interop\RECT.cs" />
     <Compile Include="Interop\SW.cs" />
-    <Compile Include="Interop\SWP.cs" />
-    <Compile Include="Interop\TernaryRasterOperations.cs" />
     <Compile Include="Interop\Win32.cs" />
     <Compile Include="Interop\GWL.cs" />
-    <Compile Include="Interop\WINDOWPLACEMENT.cs" />
     <Compile Include="Interop\WS_EX.cs" />
     <Compile Include="Interop\WS.cs" />
     <Compile Include="Program.cs" />
@@ -167,6 +158,12 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\Images\record_screen.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\FastCapt.Recorders\FastCapt.Recorders.csproj">
+      <Project>{329ed899-9792-4049-a276-776544dbb76e}</Project>
+      <Name>FastCapt.Recorders</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

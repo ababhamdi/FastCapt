@@ -1,9 +1,14 @@
 ﻿using System;
+using System.Drawing;
+using System.IO;
 using System.Windows.Input;
 using System.Windows.Threading;
 using FastCapt.Core;
+using FastCapt.Recorders;
+using FastCapt.Recorders.Interfaces;
 using FastCapt.Services;
 using FastCapt.Services.Interfaces;
+using Microsoft.Win32;
 
 namespace FastCapt.ViewModels
 {
@@ -22,6 +27,7 @@ namespace FastCapt.ViewModels
         private DispatcherTimer _durationTimer;
         private ICommand _selectRecordingArea;
         private IScreenSelectorService _screenSelectorService;
+        private IRecorder _recorder;
 
         #endregion
 
@@ -33,6 +39,10 @@ namespace FastCapt.ViewModels
         public MainViewModel()
         {
             Initialize();
+
+            // we only have the gif recorder for now.
+            _recorder = new GifRecorder();
+            _screenSelectorService = new ScreenSelectorService();
         }
 
         #endregion
@@ -47,8 +57,27 @@ namespace FastCapt.ViewModels
                 {
                     _stopRecordingCommand = new RelayCommand(o =>
                     {
-                        StopDurationTimer();
-                        IsRecordingPaused = IsRecording = IsRecordingAreaSelected = false;
+                        try
+                        {
+                            StopDurationTimer();
+
+                            _recorder.Stop();
+                            var saveFileDialog = new SaveFileDialog();
+                            if (saveFileDialog.ShowDialog() == true)
+                            {
+                                var fileName = saveFileDialog.FileName;
+                                if (File.Exists(fileName))
+                                {
+                                    File.Delete(fileName);
+                                }
+
+                                _recorder.Save(new FileStream(fileName, FileMode.CreateNew));
+                            }
+                        }
+                        finally
+                        {
+                            IsRecordingPaused = IsRecording = IsRecordingAreaSelected = false;
+                        }
 
                     },
                     o => IsRecordingAreaSelected && (IsRecording || IsRecordingPaused));
@@ -66,8 +95,17 @@ namespace FastCapt.ViewModels
                 {
                     _startRecordingCommand = new RelayCommand(o =>
                     {
-                        StartDurationTimer();
-                        IsRecording = true;
+                        try
+                        {
+                            StartDurationTimer();
+                            var rect = _screenSelectorService.RecordingArea;
+                            _recorder.Start(new Rectangle((int)rect.X, (int)rect.Y, (int)rect.Width, (int)rect.Height));
+                            IsRecording = true;
+                        }
+                        catch (Exception)
+                        {
+                            IsRecording = false;
+                        }
                     },
                     o => IsRecordingAreaSelected );
                 }
@@ -86,6 +124,7 @@ namespace FastCapt.ViewModels
                     {
                         IsRecordingPaused = !IsRecordingPaused;
                         PauseOrResumeDurationTimer();
+                        _recorder.Pause();
                     });
                 }
                 return _pauseRecordingCommand;
@@ -101,8 +140,7 @@ namespace FastCapt.ViewModels
                     _selectRecordingArea = new RelayCommand(
                         o =>
                         {
-                            var selectionService = new ScreenSelectorService();
-                            var result = selectionService.SelectArea();
+                            var result = _screenSelectorService.SelectArea();
                             if (result)
                             {
                                 IsRecordingAreaSelected = true;

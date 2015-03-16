@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
-namespace FastCapt.Interop
+namespace FastCapt.Recorders.Interop
 {
     /// <summary>
     /// Contains global cursor information.

@@ -1,7 +1,10 @@
-﻿namespace FastCapt.Services.Interfaces
+﻿using System.Windows;
+
+namespace FastCapt.Services.Interfaces
 {
     public interface IScreenSelectorService : IStartupService
     {
         bool SelectArea();
+        Rect RecordingArea { get; set; }
     }
 }

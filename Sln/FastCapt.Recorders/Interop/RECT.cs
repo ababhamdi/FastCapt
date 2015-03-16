@@ -1,6 +1,6 @@
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
 
-namespace FastCapt.Interop
+namespace FastCapt.Recorders.Interop
 {
     [StructLayout(LayoutKind.Sequential)]
     public struct RECT
