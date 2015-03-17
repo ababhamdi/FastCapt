@@ -1,6 +1,4 @@
-﻿using System.Windows.Controls;
-
-namespace FastCapt.Controls
+﻿namespace FastCapt.Controls
 {
     /// <summary>
     /// Interaction logic for DimensionsView.xaml

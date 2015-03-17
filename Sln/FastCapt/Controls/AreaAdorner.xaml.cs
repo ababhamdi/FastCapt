@@ -87,6 +87,27 @@ namespace FastCapt.Controls
 
         #endregion
 
+        #region IsRecording
+
+        public static readonly DependencyProperty IsRecordingProperty = DependencyProperty.Register(
+            "IsRecording",
+            typeof(bool),
+            typeof(AreaAdorner),
+            new FrameworkPropertyMetadata(
+                BooleanBoxes.False,
+                FrameworkPropertyMetadataOptions.None));
+
+        /// <summary>
+        /// Gets or sets a value that indicates whether we're in recording mode.
+        /// </summary>
+        public bool IsRecording
+        {
+            get { return (bool)GetValue(IsRecordingProperty); }
+            set { SetValue(IsRecordingProperty, BooleanBoxes.Box(value)); }
+        }
+
+        #endregion
+
         #endregion
 
         #region "Methods"

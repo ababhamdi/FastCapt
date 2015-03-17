@@ -4,11 +4,13 @@
              xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
              xmlns:controls="clr-namespace:FastCapt.Controls"
+             xmlns:converters="clr-namespace:FastCapt.Converters"
              Cursor="Cross">
     <UserControl.Resources>
         <SolidColorBrush x:Key="ShadowBrush" Color="Black" Opacity="0.5" />
         <SolidColorBrush x:Key="SelectedShadowBrush" Color="Black" Opacity="0.25" />
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+        <converters:InvertedBooleanToVisibilityConverter x:Key="InvertedBooleanToVisibilityConverter" />
     </UserControl.Resources>
 
     <Grid>
@@ -44,9 +46,14 @@
                                              Path=IsSelecting,
                                              Converter={StaticResource BooleanToVisibilityConverter}}"
                         Background="#01000000">
-                    <controls:DimensionsView VerticalAlignment="Center" HorizontalAlignment="Center"
+	                <controls:DimensionsView VerticalAlignment="Center"
+                                             HorizontalAlignment="Center"
                                              DataContext="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=controls:SelectionShadow}, Path=RecordingRect}"/>
                 </Border>
+                <controls:RecordingAdorner x:Name="RecordingAdorner"
+                                           Visibility="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:SelectionShadow}},
+                                                                Path=IsRecording,
+                                                                Converter={StaticResource BooleanToVisibilityConverter}}"/>
             </Canvas>
         </Grid>
     </Grid>

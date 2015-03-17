@@ -75,6 +75,9 @@
       <DependentUpon>DimensionsView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Controls\Dock.cs" />
+    <Compile Include="Controls\RecordingAdorner.xaml.cs">
+      <DependentUpon>RecordingAdorner.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Controls\SelectionShadow.xaml.cs">
       <DependentUpon>SelectionShadow.xaml</DependentUpon>
     </Compile>
@@ -93,12 +96,17 @@
     <Compile Include="Services\Interfaces\IStartupService.cs" />
     <Compile Include="Services\Interfaces\IScreenSelectorService.cs" />
     <Compile Include="Services\ScreenSelectorService.cs" />
+    <Compile Include="ViewModels\DialogManager.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
     <Page Include="Controls\AreaAdorner.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Controls\DimensionsView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\RecordingAdorner.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

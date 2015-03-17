@@ -8,30 +8,9 @@ using FastCapt.Recorders;
 using FastCapt.Recorders.Interfaces;
 using FastCapt.Services;
 using FastCapt.Services.Interfaces;
-using Microsoft.Win32;
 
 namespace FastCapt.ViewModels
 {
-    public class DialogManager
-    {
-        public bool ShowRecordingSaveDialog(out string fileName)
-        {
-            var saveFileDialog = new SaveFileDialog {Filter = "Gif Image (*.gif)|*.gif"};
-            if (saveFileDialog.ShowDialog() == true)
-            {
-                fileName = saveFileDialog.FileName;
-                if (File.Exists(fileName))
-                {
-                    File.Delete(fileName);
-                }
-                return true;
-            }
-
-            fileName = null;
-            return false;
-        }
-    }
-
     public class MainViewModel : ObservableObject
     {
         #region "Fields"
@@ -98,7 +77,7 @@ namespace FastCapt.ViewModels
                             StartDurationTimer();
                             var rect = _screenSelectorService.RecordingArea;
                             _recorder.Start(new Rectangle((int)rect.X, (int)rect.Y, (int)rect.Width, (int)rect.Height));
-                            IsRecording = true;
+                            _screenSelectorService.IsRecording = IsRecording = true;
                         }
                         catch (Exception)
                         {
@@ -245,6 +224,7 @@ namespace FastCapt.ViewModels
             {
                 StopDurationTimer();
                 _recorder.Stop();
+                _screenSelectorService.Unload();
                 string fileName;
                 if (_dialogManager.ShowRecordingSaveDialog(out fileName))
                 {
@@ -254,6 +234,7 @@ namespace FastCapt.ViewModels
             finally
             {
                 IsRecordingPaused = IsRecording = IsRecordingAreaSelected = false;
+                _screenSelectorService.IsRecording = false;
             }
         }
 

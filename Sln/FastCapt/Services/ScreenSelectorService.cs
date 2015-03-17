@@ -49,10 +49,24 @@ namespace FastCapt.Services
             }
         }
 
+        public bool IsRecording
+        {
+            get { return _isRecording; }
+            set
+            {
+                if (_isRecording == value)
+                    return;
+
+                _isRecording = value;
+                RaisePropertyChanged();
+            }
+        }
+
         #endregion
 
         private DispatcherFrame _dispatcherFrame;
         private bool _isAreaSelected;
+        private bool _isRecording;
 
         public bool SelectArea()
         {
@@ -100,13 +114,20 @@ namespace FastCapt.Services
             {
                 RootVisual = PreparePreviewShadow()
             };
-
-
+            
             _previewShadow.AreaSelected += (sender, args) =>
             {
                 OnAreaSelected();
             };
 
+            var binding = new System.Windows.Data.Binding
+            {
+                Source = this,
+                Path = new PropertyPath("IsRecording"),
+                Mode = BindingMode.OneWay
+            };
+            _previewShadow.SetBinding(SelectionShadow.IsRecordingProperty, binding);
+            _selectorHwnd = _previewShadowHwndSource.Handle;
             Win32.ShowWindow(_previewShadowHwndSource.Handle, (int)SW.SHOW);
         }
 
@@ -135,6 +156,7 @@ namespace FastCapt.Services
                 RootVisual = PrepareAreaAdornerRoot()
             };
 
+            _adornerHwnd = areaAdornerHwndSource.Handle;
             Win32.ShowWindow(areaAdornerHwndSource.Handle, (int)SW.SHOW);
             DismissModalFrame();
             _isAreaSelected = true;
@@ -183,6 +205,14 @@ namespace FastCapt.Services
                 Mode = BindingMode.TwoWay
             });
 
+            var binding = new System.Windows.Data.Binding
+            {
+                Source = this,
+                Path = new PropertyPath("IsRecording"),
+                Mode = BindingMode.OneWay
+            };
+            areaAdorner.SetBinding(AreaAdorner.IsRecordingProperty, binding);
+
             Canvas.SetLeft(areaAdorner, RecordingArea.Left);
             Canvas.SetTop(areaAdorner, RecordingArea.Top);
             areaAdorner.Width = RecordingArea.Width;
@@ -217,7 +247,7 @@ namespace FastCapt.Services
             return _previewShadow;
         }
 
-        #region "IStartupService interface implementation"
+        #region "IStartupService implementation"
 
         public void Run()
         {
@@ -245,6 +275,16 @@ namespace FastCapt.Services
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// will unload all elements that make up the screen selector.
+        /// </summary>
+        public void Unload()
+        {
+            // for the moment just hide the windows.
+            Win32.ShowWindow(_adornerHwnd, (int)SW.HIDE);
+            Win32.ShowWindow(_selectorHwnd, (int)SW.HIDE);
         }
     }
 }

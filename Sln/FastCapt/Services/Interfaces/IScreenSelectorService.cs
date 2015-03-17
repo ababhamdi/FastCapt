@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System.Security.Policy;
+using System.Windows;
 
 namespace FastCapt.Services.Interfaces
 {
@@ -6,5 +7,9 @@ namespace FastCapt.Services.Interfaces
     {
         bool SelectArea();
         Rect RecordingArea { get; set; }
+
+        bool IsRecording { get; set; }
+
+        void Unload();
     }
 }

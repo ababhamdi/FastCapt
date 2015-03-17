@@ -149,6 +149,27 @@ namespace FastCapt.Controls
 
         #endregion
 
+        #region IsRecording
+
+        public static readonly DependencyProperty IsRecordingProperty = DependencyProperty.Register(
+            "IsRecording",
+            typeof(bool),
+            typeof(SelectionShadow),
+            new FrameworkPropertyMetadata(
+                BooleanBoxes.False,
+                FrameworkPropertyMetadataOptions.None));
+
+        /// <summary>
+        /// Gets or sets a value that indicates whether we're in recording mode.
+        /// </summary>
+        public bool IsRecording
+        {
+            get { return (bool)GetValue(IsRecordingProperty); }
+            set { SetValue(IsRecordingProperty, BooleanBoxes.Box(value)); }
+        }
+
+        #endregion
+
         #endregion
 
         #region "Events"
@@ -208,6 +229,7 @@ namespace FastCapt.Controls
             var newRect = (Rect)e.NewValue;
             this.AreaGeometry.Rect = newRect;
             InvalidateAreaAdornerPlacement();
+            InvalidateRecordingAdornerPlacement();
         }
 
         private void InvalidateAreaAdornerPlacement()
@@ -216,6 +238,14 @@ namespace FastCapt.Controls
             Canvas.SetLeft(this.AreaAdorner, RecordingRect.Left);
             this.AreaAdorner.Width = RecordingRect.Width;
             this.AreaAdorner.Height = RecordingRect.Height;
+        }
+
+        private void InvalidateRecordingAdornerPlacement()
+        {
+            Canvas.SetTop(RecordingAdorner, RecordingRect.Top);
+            Canvas.SetLeft(RecordingAdorner, RecordingRect.Left);
+            RecordingAdorner.Width = RecordingRect.Width;
+            RecordingAdorner.Height = RecordingRect.Height;
         }
 
         protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
