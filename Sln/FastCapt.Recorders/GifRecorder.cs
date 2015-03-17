@@ -28,8 +28,10 @@ namespace FastCapt.Recorders
         private MemoryStream _stream;
         private int _width;
         private int _height;
+        private int _interval;
+        private Timer _timer;
         private IList<BitmapFrame> _frames;
-        private HBitmap _previousBitmap = null;
+        private HBitmap _previousBitmap;
 
         private SnapshotManager _snapshotManager;
         private DesktopManager _desktopManager;
@@ -88,6 +90,9 @@ namespace FastCapt.Recorders
                 var buffer = _stream.GetBuffer();
                 writer.Write(buffer, 0, buffer.Length);
             }
+            
+            _stream.Dispose();
+            _stream = null;
         }
 
         public void Start(Rectangle rect)
@@ -105,9 +110,7 @@ namespace FastCapt.Recorders
         public void Pause()
         {
         }
-
-        private int _interval;
-        private Timer _timer;
+        
         private void InitAndLaunchTimer()
         {
             // initialize and launch the timer
@@ -130,10 +133,10 @@ namespace FastCapt.Recorders
                 _desktopManager.RelaseDeviceContext();
             }
 
-            this.AddFrame(bitmap, _interval);
+            AddFrame(bitmap, _interval);
         }
 
-        public void AddFrame(HBitmap frameBitmap, int delay)
+        private void AddFrame(HBitmap frameBitmap, int delay)
         {
             if (_frames.Count == 0)
             {
@@ -166,33 +169,18 @@ namespace FastCapt.Recorders
             metadataWriter.SetMetadataByName("/logscrdesc/Width", Convert.ToUInt16(_width));
             metadataWriter.SetMetadataByName("/logscrdesc/Height", Convert.ToUInt16(_height));
 
-            WriteApplicationMetadata(metadataWriter.NativePointer);
-            WriteLoopingMetadata(metadataWriter.NativePointer);
+            //WriteApplicationMetadata(metadataWriter.NativePointer);
+            var metadataQwPtr = metadataWriter.NativePointer;
+            WriteMetadata(metadataQwPtr, "/appext/Application", Encoding.ASCII.GetBytes("NETSCAPE2.0"));
+            WriteMetadata(metadataQwPtr, "/appext/Data", new byte[] {3, 1, 0, 0, 0});
         }
 
-        private void WriteApplicationMetadata(IntPtr handle)
+        private void WriteMetadata(IntPtr metadataWriter, string name, byte[] buffer)
         {
-            // writing application metadata block. (VT_UI1 | VT_VECTOR)
-            var netscapeValue = Encoding.ASCII.GetBytes("NETSCAPE2.0");
-            var bufferPtr = Marshal.AllocHGlobal(netscapeValue.Length);
-
-            unsafe
-            {
-                for (int i = 0; i < netscapeValue.Length; i++)
-                {
-                    ((byte*)bufferPtr)[i] = netscapeValue[i];
-                }
-            }
-
-            PROPVARIANT propvariant;
-            HResult.Check(NativeMethods.InitPropVariantFromBuffer(bufferPtr, (uint)netscapeValue.Length, out propvariant));
-            HResult.Check(WICMetadataQueryWriter.SetMetadataByName(handle, "/appext/Application", ref propvariant));
-        }
-
-        private void WriteLoopingMetadata(IntPtr handle)
-        {
-            var buffer = new byte[] { 3, 1, 0, 0, 0 };
+            // allocate unmaaged memory for the buffer
             var bufferPtr = Marshal.AllocHGlobal(buffer.Length);
+
+            // copy content
             unsafe
             {
                 for (int i = 0; i < buffer.Length; i++)
@@ -201,9 +189,20 @@ namespace FastCapt.Recorders
                 }
             }
 
-            PROPVARIANT dataVariant;
-            HResult.Check(NativeMethods.InitPropVariantFromBuffer(bufferPtr, (uint)buffer.Length, out dataVariant));
-            HResult.Check(WICMetadataQueryWriter.SetMetadataByName(handle, "/appext/Data", ref dataVariant));
+            try
+            {
+                PROPVARIANT propVariant;
+                HResult.Check(NativeMethods.InitPropVariantFromBuffer(bufferPtr, (uint) buffer.Length, out propVariant));
+
+                using (propVariant)
+                {
+                    HResult.Check(WICMetadataQueryWriter.SetMetadataByName(metadataWriter, name, ref propVariant));
+                }
+            }
+            finally
+            {
+                Marshal.FreeHGlobal(bufferPtr);
+            }
         }
 
         private void EncodeFrames()
@@ -216,7 +215,10 @@ namespace FastCapt.Recorders
             for (int index = 0; index < _frames.Count; index++)
             {
                 var frame = _frames[index];
-                FlushCurrentFrame(_gifBitmapEncoder, _imagingFactory, frame);
+                using (frame)
+                {
+                    FlushCurrentFrame(_gifBitmapEncoder, _imagingFactory, frame);
+                }
             }
         }
 
@@ -238,7 +240,7 @@ namespace FastCapt.Recorders
 
                 // embed frame metadata.
                 var metadataWriter = frameEncoder.MetadataQueryWriter;
-                metadataWriter.SetMetadataByName("/grctlext/Delay", Convert.ToUInt16(bitmap.Delay / 100));
+                metadataWriter.SetMetadataByName("/grctlext/Delay", Convert.ToUInt16(bitmap.Delay/100));
                 metadataWriter.SetMetadataByName("/imgdesc/Left", Convert.ToUInt16(bitmap.XPos));
                 metadataWriter.SetMetadataByName("/imgdesc/Top", Convert.ToUInt16(bitmap.YPos));
                 metadataWriter.SetMetadataByName("/imgdesc/Width", Convert.ToUInt16(bitmap.Data.Width));
@@ -273,7 +275,7 @@ namespace FastCapt.Recorders
         {
             if (newBitmap == null)
             {
-                throw new ArgumentNullException("@newBitmap");
+                throw new ArgumentNullException("newBitmap");
             }
 
             if (originalBitmap == null)
@@ -288,10 +290,10 @@ namespace FastCapt.Recorders
                 throw new InvalidOperationException("The images must have the same Width and Height.");
             }
 
-            //if (originalBitmap.PixelFormat != newBitmap.PixelFormat)
-            //{
-            //    throw new InvalidOperationException("The images must have the same PixelFormat");
-            //}
+            if (originalBitmap.PixelFormat != newBitmap.PixelFormat)
+            {
+                throw new InvalidOperationException("The images must have the same PixelFormat");
+            }
 
             /* TIP: stride represents the number of bytes for a given row image. */
 

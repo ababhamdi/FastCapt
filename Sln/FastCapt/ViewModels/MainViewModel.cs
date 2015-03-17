@@ -12,6 +12,26 @@ using Microsoft.Win32;
 
 namespace FastCapt.ViewModels
 {
+    public class DialogManager
+    {
+        public bool ShowRecordingSaveDialog(out string fileName)
+        {
+            var saveFileDialog = new SaveFileDialog {Filter = "Gif Image (*.gif)|*.gif"};
+            if (saveFileDialog.ShowDialog() == true)
+            {
+                fileName = saveFileDialog.FileName;
+                if (File.Exists(fileName))
+                {
+                    File.Delete(fileName);
+                }
+                return true;
+            }
+
+            fileName = null;
+            return false;
+        }
+    }
+
     public class MainViewModel : ObservableObject
     {
         #region "Fields"
@@ -28,6 +48,7 @@ namespace FastCapt.ViewModels
         private ICommand _selectRecordingArea;
         private IScreenSelectorService _screenSelectorService;
         private IRecorder _recorder;
+        private DialogManager _dialogManager;
 
         #endregion
 
@@ -43,6 +64,7 @@ namespace FastCapt.ViewModels
             // we only have the gif recorder for now.
             _recorder = new GifRecorder();
             _screenSelectorService = new ScreenSelectorService();
+            _dialogManager = new DialogManager();
         }
 
         #endregion
@@ -55,32 +77,8 @@ namespace FastCapt.ViewModels
             {
                 if (_stopRecordingCommand == null)
                 {
-                    _stopRecordingCommand = new RelayCommand(o =>
-                    {
-                        try
-                        {
-                            StopDurationTimer();
-
-                            _recorder.Stop();
-                            var saveFileDialog = new SaveFileDialog();
-                            if (saveFileDialog.ShowDialog() == true)
-                            {
-                                var fileName = saveFileDialog.FileName;
-                                if (File.Exists(fileName))
-                                {
-                                    File.Delete(fileName);
-                                }
-
-                                _recorder.Save(new FileStream(fileName, FileMode.CreateNew));
-                            }
-                        }
-                        finally
-                        {
-                            IsRecordingPaused = IsRecording = IsRecordingAreaSelected = false;
-                        }
-
-                    },
-                    o => IsRecordingAreaSelected && (IsRecording || IsRecordingPaused));
+                    _stopRecordingCommand = new RelayCommand(o => OnStopRecording(),
+                        o => IsRecordingAreaSelected && (IsRecording || IsRecordingPaused));
                 }
 
                 return _stopRecordingCommand;
@@ -240,6 +238,24 @@ namespace FastCapt.ViewModels
         #endregion
 
         #region "Methods"
+
+        private void OnStopRecording()
+        {
+            try
+            {
+                StopDurationTimer();
+                _recorder.Stop();
+                string fileName;
+                if (_dialogManager.ShowRecordingSaveDialog(out fileName))
+                {
+                    _recorder.Save(new FileStream(fileName, FileMode.CreateNew));
+                }
+            }
+            finally
+            {
+                IsRecordingPaused = IsRecording = IsRecordingAreaSelected = false;
+            }
+        }
 
         private void Initialize()
         {

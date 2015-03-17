@@ -1,5 +1,6 @@
 ﻿using System;
 using FastCapt.Recorders.Interop;
+using FastCapt.Recorders.Resources;
 
 namespace FastCapt.Recorders.Internals
 {
@@ -8,42 +9,52 @@ namespace FastCapt.Recorders.Internals
     /// </summary>
     internal class DesktopManager
     {
+        #region "Fields"
+
         private IntPtr _desktopWindowHandle;
         private IntPtr _desktopDeviceContext;
+
+        #endregion
+
+        #region "Properties"
 
         public IntPtr DeviceContext
         {
             get { return _desktopDeviceContext; }
         }
 
+        #endregion
+
+        #region "Methods"
+
         public void AcquireDeviceContext()
         {
             _desktopWindowHandle = NativeMethods.GetDesktopWindow();
             if (_desktopWindowHandle == IntPtr.Zero)
             {
-                throw new Exception("Failed to get the desktop window handle");
+                throw new Exception(Exceptions.Failed_DesktopWindow_Handle);
             }
 
             _desktopDeviceContext = NativeMethods.GetDC(_desktopWindowHandle);
+            if (_desktopDeviceContext == IntPtr.Zero)
+            {
+                throw new Exception(Exceptions.Failed_DesktopWnd_DC);
+            }
         }
 
         public void RelaseDeviceContext()
         {
+            // in case we previously failed to aquire the desktop or dc handle.
             if (_desktopDeviceContext == IntPtr.Zero || _desktopWindowHandle == IntPtr.Zero)
             {
                 return;
             }
 
-            bool success = NativeMethods.ReleaseDC(_desktopWindowHandle, _desktopDeviceContext);
-            if (!success)
+            if (!NativeMethods.ReleaseDC(_desktopWindowHandle, _desktopDeviceContext))
             {
-
+                throw new Exception(Exceptions.DesktopWnd_FailReleaseDC);
             }
         }
-
-        #region Native Methods
-
-
 
         #endregion
     }

@@ -5,6 +5,7 @@ using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
 using FastCapt.Recorders.Interfaces;
 using FastCapt.Recorders.Interop;
+using FastCapt.Recorders.Resources;
 
 namespace FastCapt.Recorders
 {
@@ -21,12 +22,16 @@ namespace FastCapt.Recorders
         private readonly int _top;
         private readonly int _width;
         private IntPtr _snapshotDc;
-        private IntPtr _desktopDc; 
+        private IntPtr _desktopDc;
+        private bool _isInitialized;
 
         #endregion
 
         #region "Constructors"
 
+        /// <summary>
+        /// Initializes instance members of the <see cref="SnapshotManager"/> class.
+        /// </summary>
         public SnapshotManager(int left, int top, int width, int height)
         {
             _left = left;
@@ -39,7 +44,14 @@ namespace FastCapt.Recorders
 
         #region "Properties"
 
+        /// <summary>
+        /// Gets a value that indicates the height of the snapshot.
+        /// </summary>
         public int Height { get { return _height; } }
+
+        /// <summary>
+        /// Gets a value that indicates the width of the snapshot.
+        /// </summary>
         public int Width { get { return _width; } } 
 
         #endregion
@@ -48,22 +60,50 @@ namespace FastCapt.Recorders
 
         public void Initialize(IntPtr desktopDc)
         {
+            if (desktopDc == IntPtr.Zero)
+            {
+                throw new ArgumentException(Exceptions.DeviceContext_NotInit);
+            }
+
             _desktopDc = desktopDc;
+            _isInitialized = true;
+        }
+
+        private void EnsureInitialization()
+        {
+            if (_isInitialized)
+            {
+                return;
+            }
+
+            throw new Exception(Exceptions.SnapshotManager_InitializeFail);
+        }
+
+        private void EnsureHandle(IntPtr handle, string errorMessage)
+        {
+            if (handle == IntPtr.Zero)
+            {
+                throw new Exception(errorMessage);
+            }
         }
 
         public Bitmap TakeSnapshot()
         {
+            EnsureInitialization();
+
             // create the in-memory device context.
             _snapshotDc = NativeMethods.CreateCompatibleDC(_desktopDc);
+            EnsureHandle(_snapshotDc, Exceptions.CompatibleDC_Create_Fail);
 
             // initialize the buffer
             var snapshotPtr = NativeMethods.CreateCompatibleBitmap(
                 _desktopDc,
                 Width,
                 Height);
+            EnsureHandle(snapshotPtr, Exceptions.CompatibleBitmap_Fail);
 
             // associate the bitmap buffer with the in-memory device context.
-            NativeMethods.SelectObject(_snapshotDc, snapshotPtr);
+            EnsureHandle(NativeMethods.SelectObject(_snapshotDc, snapshotPtr), Exceptions.SelectObject_Fail);
 
             var success = NativeMethods.BitBlt(
                 _snapshotDc,
@@ -81,6 +121,10 @@ namespace FastCapt.Recorders
                 RenderMouseCursor();
                 NativeMethods.DeleteDC(_snapshotDc);
             }
+            else
+            {
+                throw new Exception(Exceptions.BitBlt_Fail);
+            }
 
             var image = Image.FromHbitmap(snapshotPtr);
             return ConvertToRGBA(image);
@@ -91,9 +135,13 @@ namespace FastCapt.Recorders
             var height = image.Height;
             var width = image.Width;
             var clone = new Bitmap(width, height, PixelFormat.Format32bppPArgb);
-            using (var g = Graphics.FromImage(clone))
+
+            using (image)
             {
-                g.DrawImage(image, new Rectangle(0, 0, width, height));
+                using (var g = Graphics.FromImage(clone))
+                {
+                    g.DrawImage(image, new Rectangle(0, 0, width, height));
+                }
             }
 
             return clone;

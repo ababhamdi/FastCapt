@@ -5,15 +5,41 @@ namespace FastCapt.Recorders.Interop
 {
     internal static class NativeMethods
     {
-
+        /// <summary>
+        /// Retrieves a handle to the desktop window. The desktop window covers the entire screen.
+        /// The desktop window is the area on top of which other windows are painted.
+        /// </summary>
+        /// <returns>The return value is a handle to the desktop window.</returns>
         [DllImport(ExternalDlls.USER32, SetLastError = false)]
         public static extern IntPtr GetDesktopWindow();
 
+        /// <summary>
+        /// The GetDC function retrieves a handle to a device context (DC) for the client
+        /// area of a specified window or for the entire screen.
+        /// You can use the returned handle in subsequent GDI functions to draw in the DC.
+        /// The device context is an opaque data structure, whose values are used internally by GDI.
+        /// </summary>
+        /// <param name="hWnd">
+        /// A handle to the window whose DC is to be retrieved.
+        /// If this value is NULL, GetDC retrieves the DC for the entire screen.
+        /// </param>
+        /// <returns>
+        /// If the function succeeds, the return value is a handle to the DC for the specified window's client area.
+        /// If the function fails, the return value is NULL.
+        /// </returns>
         [DllImport(ExternalDlls.USER32)]
         public static extern IntPtr GetDC(IntPtr hWnd);
 
+        /// <summary>
+        /// The ReleaseDC function releases a device context (DC), freeing it for use by other applications.
+        /// The effect of the ReleaseDC function depends on the type of DC.
+        /// It frees only common and window DCs. It has no effect on class or private DCs.
+        /// </summary>
+        /// <param name="hWnd">A handle to the window whose DC is to be released.</param>
+        /// <param name="hDc">A handle to the DC to be released.</param>
+        /// <returns>true if successful otherwise false.</returns>
         [DllImport(ExternalDlls.USER32)]
-        internal static extern bool ReleaseDC(IntPtr hWnd, IntPtr hDC);
+        internal static extern bool ReleaseDC(IntPtr hWnd, IntPtr hDc);
 
 
         /// <summary>
@@ -72,6 +98,17 @@ namespace FastCapt.Recorders.Interop
             int nWidth,
             int nHeight);
 
+        /// <summary>
+        /// The CreateCompatibleDC function creates a memory device context (DC)
+        /// compatible with the specified device.
+        /// </summary>
+        /// <param name="hdc">
+        /// A handle to an existing DC. If this handle is NULL, the function creates a memory DC
+        /// compatible with the application's current screen.</param>
+        /// <returns>
+        /// If the function succeeds, the return value is the handle to a memory DC.
+        /// If the function fails, the return value is <see cref="IntPtr.Zero"/>.
+        /// </returns>
         [DllImport(ExternalDlls.GDI32, ExactSpelling = true, SetLastError = true)]
         public static extern IntPtr CreateCompatibleDC(IntPtr hdc);
 
@@ -114,5 +151,19 @@ namespace FastCapt.Recorders.Interop
             int nXSrc,
             int nYSrc,
             TernaryRasterOperations dwRop);
+
+
+        /// <summary>
+        /// The PropVariantClear function frees all elements that can be freed in a given PROPVARIANT structure. 
+        /// For complex elements with known element pointers, the underlying elements are freed prior to freeing
+        /// the containing element.
+        /// </summary>
+        /// <param name="pvar">
+        /// A pointer to an initialized <see cref="PROPVARIANT"/> structure for which any deallocatable elements
+        /// are to be freed. On return, all zeroes are written to the PROPVARIANT structure.
+        /// </param>
+        /// <returns></returns>
+        [DllImport(ExternalDlls.OLE32)]
+        internal static extern int PropVariantClear(ref PROPVARIANT pvar);
     }
 }
