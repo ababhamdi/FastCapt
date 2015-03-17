@@ -1,10 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.Composition;
 using System.Diagnostics;
+using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading;
+using FastCapt.Recorders.Interfaces;
 using FastCapt.Recorders.Internals;
 using FastCapt.Recorders.Interop;
 using SharpDX.WIC;
@@ -14,7 +18,8 @@ using PixelFormat = SharpDX.WIC.PixelFormat;
 
 namespace FastCapt.Recorders
 {
-    public class GifRecorder
+    [Export(typeof(IRecorder))]
+    public class GifRecorder : IRecorder
     {
         #region "Fields"
 
@@ -23,7 +28,13 @@ namespace FastCapt.Recorders
         private MemoryStream _stream;
         private int _width;
         private int _height;
+        private int _interval;
+        private Timer _timer;
         private IList<BitmapFrame> _frames;
+        private HBitmap _previousBitmap;
+
+        private SnapshotManager _snapshotManager;
+        private DesktopManager _desktopManager;
 
         #endregion
 
@@ -33,6 +44,11 @@ namespace FastCapt.Recorders
         /// Gets or sets the repeat count of the produced GIF.
         /// </summary>
         public int GifRepeatCount { get; set; }
+
+        /// <summary>
+        /// Gets or sets the maximum number of frames per second.
+        /// </summary>
+        public byte MaxFramePerSecond { get; set; }
 
         /// <summary>
         /// Gets or sets a value that indicates the current frame delay.
@@ -51,33 +67,76 @@ namespace FastCapt.Recorders
             GifRepeatCount = 0;
             _imagingFactory = new ImagingFactory();
             _frames = new List<BitmapFrame>();
+            MaxFramePerSecond = 8;
+            _desktopManager = new DesktopManager();
         }
 
         #endregion
 
         #region "Methods"
 
-        public void Save(string filePath)
+        public void Stop()
         {
+            _timer.Dispose();
             WriteGlobalMetadata();
             EncodeFrames();
             _gifBitmapEncoder.Commit();
-            File.WriteAllBytes(filePath, _stream.GetBuffer());
         }
 
-        public void StartRecording(int width, int height)
+        public void Save(Stream stream)
         {
+            using (var writer = new BinaryWriter(stream))
+            {
+                var buffer = _stream.GetBuffer();
+                writer.Write(buffer, 0, buffer.Length);
+            }
+            
+            _stream.Dispose();
+            _stream = null;
+        }
+
+        public void Start(Rectangle rect)
+        {
+            _snapshotManager = new SnapshotManager(rect.Left, rect.Top, rect.Width, rect.Height);
             _stream = new MemoryStream();
             _gifBitmapEncoder = new GifBitmapEncoder(_imagingFactory);
             _gifBitmapEncoder.Initialize(_stream);
 
-            _width = width;
-            _height = height;
+            _width = rect.Width;
+            _height = rect.Height;
+            InitAndLaunchTimer();
         }
 
-        private HBitmap _previousBitmap = null;
+        public void Pause()
+        {
+        }
+        
+        private void InitAndLaunchTimer()
+        {
+            // initialize and launch the timer
+            Delay = _interval = Convert.ToInt32((1000/MaxFramePerSecond));
+            _timer = new Timer(OnTakeSnapshot, null, 0, _interval);
+        }
 
-        public void AddFrame(HBitmap frameBitmap, int delay)
+        private void OnTakeSnapshot(object state)
+        {
+            HBitmap bitmap;
+
+            try
+            {
+                _desktopManager.AcquireDeviceContext();
+                _snapshotManager.Initialize(_desktopManager.DeviceContext);
+                bitmap = _snapshotManager.TakeSnapshot();
+            }
+            finally
+            {
+                _desktopManager.RelaseDeviceContext();
+            }
+
+            AddFrame(bitmap, _interval);
+        }
+
+        private void AddFrame(HBitmap frameBitmap, int delay)
         {
             if (_frames.Count == 0)
             {
@@ -110,33 +169,18 @@ namespace FastCapt.Recorders
             metadataWriter.SetMetadataByName("/logscrdesc/Width", Convert.ToUInt16(_width));
             metadataWriter.SetMetadataByName("/logscrdesc/Height", Convert.ToUInt16(_height));
 
-            WriteApplicationMetadata(metadataWriter.NativePointer);
-            WriteLoopingMetadata(metadataWriter.NativePointer);
+            //WriteApplicationMetadata(metadataWriter.NativePointer);
+            var metadataQwPtr = metadataWriter.NativePointer;
+            WriteMetadata(metadataQwPtr, "/appext/Application", Encoding.ASCII.GetBytes("NETSCAPE2.0"));
+            WriteMetadata(metadataQwPtr, "/appext/Data", new byte[] {3, 1, 0, 0, 0});
         }
 
-        private void WriteApplicationMetadata(IntPtr handle)
+        private void WriteMetadata(IntPtr metadataWriter, string name, byte[] buffer)
         {
-            // writing application metadata block. (VT_UI1 | VT_VECTOR)
-            var netscapeValue = Encoding.ASCII.GetBytes("NETSCAPE2.0");
-            var bufferPtr = Marshal.AllocHGlobal(netscapeValue.Length);
-
-            unsafe
-            {
-                for (int i = 0; i < netscapeValue.Length; i++)
-                {
-                    ((byte*)bufferPtr)[i] = netscapeValue[i];
-                }
-            }
-
-            PROPVARIANT propvariant;
-            HResult.Check(NativeMethods.InitPropVariantFromBuffer(bufferPtr, (uint)netscapeValue.Length, out propvariant));
-            HResult.Check(WICMetadataQueryWriter.SetMetadataByName(handle, "/appext/Application", ref propvariant));
-        }
-
-        private void WriteLoopingMetadata(IntPtr handle)
-        {
-            var buffer = new byte[] { 3, 1, 0, 0, 0 };
+            // allocate unmaaged memory for the buffer
             var bufferPtr = Marshal.AllocHGlobal(buffer.Length);
+
+            // copy content
             unsafe
             {
                 for (int i = 0; i < buffer.Length; i++)
@@ -145,14 +189,20 @@ namespace FastCapt.Recorders
                 }
             }
 
-            PROPVARIANT dataVariant;
-            HResult.Check(NativeMethods.InitPropVariantFromBuffer(bufferPtr, (uint)buffer.Length, out dataVariant));
-            HResult.Check(WICMetadataQueryWriter.SetMetadataByName(handle, "/appext/Data", ref dataVariant));
-        }
+            try
+            {
+                PROPVARIANT propVariant;
+                HResult.Check(NativeMethods.InitPropVariantFromBuffer(bufferPtr, (uint) buffer.Length, out propVariant));
 
-        private void WriteFrameMetadata()
-        {
-
+                using (propVariant)
+                {
+                    HResult.Check(WICMetadataQueryWriter.SetMetadataByName(metadataWriter, name, ref propVariant));
+                }
+            }
+            finally
+            {
+                Marshal.FreeHGlobal(bufferPtr);
+            }
         }
 
         private void EncodeFrames()
@@ -165,7 +215,10 @@ namespace FastCapt.Recorders
             for (int index = 0; index < _frames.Count; index++)
             {
                 var frame = _frames[index];
-                FlushCurrentFrame(_gifBitmapEncoder, _imagingFactory, frame);
+                using (frame)
+                {
+                    FlushCurrentFrame(_gifBitmapEncoder, _imagingFactory, frame);
+                }
             }
         }
 
@@ -187,7 +240,7 @@ namespace FastCapt.Recorders
 
                 // embed frame metadata.
                 var metadataWriter = frameEncoder.MetadataQueryWriter;
-                metadataWriter.SetMetadataByName("/grctlext/Delay", Convert.ToUInt16(bitmap.Delay / 100));
+                metadataWriter.SetMetadataByName("/grctlext/Delay", Convert.ToUInt16(bitmap.Delay/100));
                 metadataWriter.SetMetadataByName("/imgdesc/Left", Convert.ToUInt16(bitmap.XPos));
                 metadataWriter.SetMetadataByName("/imgdesc/Top", Convert.ToUInt16(bitmap.YPos));
                 metadataWriter.SetMetadataByName("/imgdesc/Width", Convert.ToUInt16(bitmap.Data.Width));
@@ -222,7 +275,7 @@ namespace FastCapt.Recorders
         {
             if (newBitmap == null)
             {
-                throw new ArgumentNullException("@newBitmap");
+                throw new ArgumentNullException("newBitmap");
             }
 
             if (originalBitmap == null)
@@ -237,8 +290,7 @@ namespace FastCapt.Recorders
                 throw new InvalidOperationException("The images must have the same Width and Height.");
             }
 
-            var pixelFormat = originalBitmap.PixelFormat;
-            if (pixelFormat != newBitmap.PixelFormat)
+            if (originalBitmap.PixelFormat != newBitmap.PixelFormat)
             {
                 throw new InvalidOperationException("The images must have the same PixelFormat");
             }
@@ -250,8 +302,8 @@ namespace FastCapt.Recorders
             var width = originalBitmap.Width;
             var height = originalBitmap.Height;
             bool breakOuterLoop = false;
-            var originalData = originalBitmap.LockBits(originalBitmap.GetBounds(), COMPARISON_LOCK_MODE, pixelFormat);
-            var newData = newBitmap.LockBits(newBitmap.GetBounds(), COMPARISON_LOCK_MODE, pixelFormat);
+            var originalData = originalBitmap.LockBits(originalBitmap.GetBounds(), COMPARISON_LOCK_MODE, originalBitmap.PixelFormat);
+            var newData = newBitmap.LockBits(newBitmap.GetBounds(), COMPARISON_LOCK_MODE, originalBitmap.PixelFormat);
 
             // find the number of bytes per pixel
             int pixelSize = 4;

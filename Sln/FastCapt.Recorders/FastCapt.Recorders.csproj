@@ -39,6 +39,7 @@
       <HintPath>..\packages\SharpDX.2.6.3\Bin\DirectX11-Signed-net40\SharpDX.Direct2D1.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
@@ -51,17 +52,43 @@
   <ItemGroup>
     <Compile Include="BitmapFrame.cs" />
     <Compile Include="GifRecorder.cs" />
+    <Compile Include="Interfaces\IRecorder.cs" />
+    <Compile Include="Interfaces\ISnapshotManager.cs" />
+    <Compile Include="Internals\DesktopManager.cs" />
     <Compile Include="Internals\Extensions.cs" />
     <Compile Include="Internals\HResult.cs" />
+    <Compile Include="Interop\CursorState.cs" />
+    <Compile Include="Interop\CURSORINFO.cs" />
+    <Compile Include="Interop\DrawingFlags.cs" />
     <Compile Include="Interop\ExternalDlls.cs" />
+    <Compile Include="Interop\GWL.cs" />
+    <Compile Include="Interop\ICONINFO.cs" />
+    <Compile Include="Interop\IconInfo`2.cs" />
     <Compile Include="Interop\NativeMethods.cs" />
+    <Compile Include="Interop\POINT.cs" />
     <Compile Include="Interop\PROPARRAY.cs" />
     <Compile Include="Interop\PROPVARIANT.cs" />
+    <Compile Include="Interop\RECT.cs" />
+    <Compile Include="Interop\SW.cs" />
+    <Compile Include="Interop\SWP.cs" />
+    <Compile Include="Interop\TernaryRasterOperations.cs" />
     <Compile Include="Interop\WICMetadataQueryWriter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Resources\Exceptions.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Exceptions.resx</DependentUpon>
+    </Compile>
+    <Compile Include="SnapshotManager.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Exceptions.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Exceptions.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\SharpDX.2.6.3\build\SharpDX.targets" Condition="Exists('..\packages\SharpDX.2.6.3\build\SharpDX.targets')" />

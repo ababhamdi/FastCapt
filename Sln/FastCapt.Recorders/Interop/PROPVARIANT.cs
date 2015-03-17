@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 namespace FastCapt.Recorders.Interop
 {
     [StructLayout(LayoutKind.Explicit, Pack = 1)]
-    internal struct PROPVARIANT
+    internal struct PROPVARIANT : IDisposable
     {
         [FieldOffset(0)]
         internal ushort varType;
@@ -49,5 +49,10 @@ namespace FastCapt.Recorders.Interop
         internal PROPARRAY ca;
         [FieldOffset(8)]
         internal System.Runtime.InteropServices.ComTypes.FILETIME filetime;
+
+        public void Dispose()
+        {
+            NativeMethods.PropVariantClear(ref this);
+        }
     }
 }

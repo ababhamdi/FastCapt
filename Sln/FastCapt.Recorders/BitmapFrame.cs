@@ -1,8 +1,9 @@
-﻿using System.Drawing;
+﻿using System;
+using System.Drawing;
 
 namespace FastCapt.Recorders
 {
-    internal class BitmapFrame
+    internal class BitmapFrame : IDisposable
     {
         #region "Properties"
 
@@ -31,6 +32,18 @@ namespace FastCapt.Recorders
             Delay = delay;
             XPos = xPos;
             YPos = yPos;
+        }
+
+        #endregion
+
+        #region "Methods"
+
+        public void Dispose()
+        {
+            if (Data != null)
+            {
+                Data.Dispose();
+            }
         }
 
         #endregion

@@ -1,4 +1,4 @@
-﻿namespace FastCapt.Interop
+namespace FastCapt.Recorders.Interop
 {
     public enum TernaryRasterOperations : uint
     {
