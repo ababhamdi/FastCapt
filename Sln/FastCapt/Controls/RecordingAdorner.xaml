@@ -2,74 +2,98 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:system="clr-namespace:System;assembly=mscorlib"
              mc:Ignorable="d" 
              d:DesignHeight="300"
              d:DesignWidth="300">
     <UserControl.Resources>
         <SolidColorBrush x:Key="FillBrush" Color="Red"/>
+        <system:Double x:Key="Length">60</system:Double>
+        <system:Double x:Key="Size">7</system:Double>
+
+        <Style x:Key="GridStyle" TargetType="Grid">
+            <Setter Property="Background" Value="Transparent" />
+            <Style.Triggers>
+                <EventTrigger RoutedEvent="Loaded">
+                    <EventTrigger.Actions>
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                                                 From="1"
+                                                 To="0"
+                                                 Duration="0:0:1"
+                                                 AutoReverse="True"
+                                                 RepeatBehavior="Forever" />
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </EventTrigger.Actions>
+                </EventTrigger>
+            </Style.Triggers>
+        </Style>
+
     </UserControl.Resources>
-    <Grid>
+    <Grid Style="{StaticResource GridStyle}">
         <Rectangle x:Name="HorTopLeft"
-                   Fill="{DynamicResource FillBrush}"
-                   Width="60"
-                   Height="7"
+                   Fill="{StaticResource FillBrush}"
+                   Width="{StaticResource Length}"
+                   Height="{StaticResource Size}"
                    VerticalAlignment="Top"
                    HorizontalAlignment="Left"
                    Margin="-7,-7,0,0" />
 
         <Rectangle x:Name="VerTopLeft"
-                   Fill="{DynamicResource FillBrush}"
-                   Width="7"
-                   Height="60"
+                   Fill="{StaticResource FillBrush}"
+                   Width="{StaticResource Size}"
+                   Height="{StaticResource Length}"
                    VerticalAlignment="Top"
                    HorizontalAlignment="Left"
                    Margin="-7,-7,0,0" />
 
         <Rectangle x:Name="HorTopRight"
-                   Fill="{DynamicResource FillBrush}"
-                   Width="60"
-                   Height="7"
+                   Fill="{StaticResource FillBrush}"
+                   Width="{StaticResource Length}"
+                   Height="{StaticResource Size}"
                    VerticalAlignment="Top"
                    HorizontalAlignment="Right"
                    Margin="0,-7,-7,0" />
 
         <Rectangle x:Name="VerTopRight"
-                   Fill="{DynamicResource FillBrush}"
-                   Width="7"
-                   Height="60"
+                   Fill="{StaticResource FillBrush}"
+                   Width="{StaticResource Size}"
+                   Height="{StaticResource Length}"
                    VerticalAlignment="Top"
                    HorizontalAlignment="Right"
                    Margin="0,-7,-7,0" />
 
         <Rectangle x:Name="HorBottomLeft"
-                   Fill="{DynamicResource FillBrush}"
-                   Width="60"
-                   Height="7"
+                   Fill="{StaticResource FillBrush}"
+                   Width="{StaticResource Length}"
+                   Height="{StaticResource Size}"
                    VerticalAlignment="Bottom"
                    HorizontalAlignment="Left"
                    Margin="-7,0,0,-7" />
 
         <Rectangle x:Name="VerBottomLeft"
-                   Fill="{DynamicResource FillBrush}"
-                   Width="7"
-                   Height="60"
+                   Fill="{StaticResource FillBrush}"
+                   Width="{StaticResource Size}"
+                   Height="{StaticResource Length}"
                    VerticalAlignment="Bottom"
                    HorizontalAlignment="Left"
                    Margin="-7,0,0,-7" />
 
         <Rectangle x:Name="HorBottomRight"
-                   Fill="{DynamicResource FillBrush}"
-                   Width="60"
-                   Height="7"
+                   Fill="{StaticResource FillBrush}"
+                   Width="{StaticResource Length}"
+                   Height="{StaticResource Size}"
                    VerticalAlignment="Bottom"
                    HorizontalAlignment="Right"
                    Margin="0,0,-7,-7" />
 
         <Rectangle x:Name="VerBottomRight"
-                   Fill="{DynamicResource FillBrush}"
-                   Width="7"
-                   Height="60"
+                   Fill="{StaticResource FillBrush}"
+                   Width="{StaticResource Size}"
+                   Height="{StaticResource Length}"
                    VerticalAlignment="Bottom"
                    HorizontalAlignment="Right"
                    Margin="0,0,-7,-7" />
