@@ -8,6 +8,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using FastCapt.Recorders.Interfaces;
 using FastCapt.Recorders.Internals;
 using FastCapt.Recorders.Interop;
@@ -95,13 +96,14 @@ namespace FastCapt.Recorders
             _stream = null;
         }
 
-        public void Start(Rectangle rect)
+        public async void Start(Rectangle rect)
         {
+            // intoduce a delay of one second.
+            await Task.Delay(TimeSpan.FromSeconds(1));
             _snapshotManager = new SnapshotManager(rect.Left, rect.Top, rect.Width, rect.Height);
             _stream = new MemoryStream();
             _gifBitmapEncoder = new GifBitmapEncoder(_imagingFactory);
             _gifBitmapEncoder.Initialize(_stream);
-
             _width = rect.Width;
             _height = rect.Height;
             InitAndLaunchTimer();
