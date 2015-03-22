@@ -7,25 +7,27 @@
         M 0,0 0,1 1,1 1,2 2,2 2,3 3,3 3,4 2,4 2,5 1,5 1,6 0,6 0,7 2,7 2,6 3,6 3,5 5,5 5,6 6,6 6,7 8,7 8,6 7,6 7,5 6,5 6,4 5,4 5,3 6,3 6,2 7,2 7,1 8,1 8,0 6,0 6,1 5,1 5,2 3,2 3,1 2,1 2,0Z
     </Geometry>
 
-    <Geometry x:Key="Document_HorizontalPinShape">
-        M 0,4 3,4 3,7 4,7 4,6 8,6 8,1 4,1 4,0 3,0 3,3 0,3 Z
-        M 4,2 7,2 7,4 4,4 Z
-    </Geometry>
+    <CombinedGeometry x:Key="RecordShapeGeometry" Geometry1="M 16,4 24,0 24,12 16,8 Z">
+        <CombinedGeometry.Geometry2>
+            <RectangleGeometry RadiusX="2" RadiusY="2" Rect="0,0,15,12" />
+        </CombinedGeometry.Geometry2>
+    </CombinedGeometry>
 
-    <Geometry x:Key="Document_VerticalPinGeometry">
-        M 4,8 4,5 7,5 7,4 6,4 6,0 1,0 1,4 0,4 0,5 3,5 3,8 Z
-        M 2,4 2,1 4,1 4,4 Z
-    </Geometry>
+    <CombinedGeometry x:Key="PauseShapeGeometry">
+        <CombinedGeometry.Geometry1>
+            <RectangleGeometry RadiusX="2" RadiusY="2" Rect="0,0,6,24" />
+        </CombinedGeometry.Geometry1>
+        <CombinedGeometry.Geometry2>
+            <RectangleGeometry RadiusX="2" RadiusY="2" Rect="10,0,6,24" />
+        </CombinedGeometry.Geometry2>
+    </CombinedGeometry>
 
-    <Geometry x:Key="Pane_VerticalPinGeometry">
-        M 4,11 4,7 7,7 7,6 6,6 6,0 1,0 1,6 0,6 0,7 3,7 3,11 Z
-            M 2,6 2,1 4,1 4,6 Z
-    </Geometry>
+    <CombinedGeometry x:Key="ResumeShapeGeometry" Geometry2="M 10,0 L 18,12 L 10,24 Z">
+        <CombinedGeometry.Geometry1>
+            <RectangleGeometry RadiusX="2" RadiusY="2" Rect="0,0,6,24" />
+        </CombinedGeometry.Geometry1>
+    </CombinedGeometry>
 
-    <Geometry x:Key="Pane_HorizontalPinShape">
-        M 0,4 4,4 4,7 5,7 5,6 11,6 11,1 5,1 5,0 4,0 4,3 0,3 Z
-        M 5,2 10,2 10,4 5,4 Z
-    </Geometry>
 
     <Geometry x:Key="Checkmark">M 0,5.1 L 1.7,5.2 L 3.4,7.1 L 8,0.4 L 9.2,0 L 3.3,10.8 Z</Geometry>
 

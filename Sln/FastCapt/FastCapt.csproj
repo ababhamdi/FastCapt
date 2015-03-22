@@ -211,13 +211,13 @@
     <AppDesigner Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Resources\Images\record_screen.png" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\FastCapt.Recorders\FastCapt.Recorders.csproj">
       <Project>{329ed899-9792-4049-a276-776544dbb76e}</Project>
       <Name>FastCapt.Recorders</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Resources\Images\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

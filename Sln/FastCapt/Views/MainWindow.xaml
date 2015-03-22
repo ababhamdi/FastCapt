@@ -6,8 +6,8 @@
         xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"
         Title="{Binding Path=Title}"
         ResizeMode="CanMinimize"
-        Height="280"
-        Width="240"
+        Height="220"
+        Width="150"
         Background="#42464F"
         Foreground="White"
         x:Name="RootWindow">
@@ -40,7 +40,7 @@
                        FontSize="25"
                        FontWeight="Bold"
                        Foreground="White" />
-            <TextBlock Margin="5" TextWrapping="Wrap">
+            <TextBlock Margin="5" TextWrapping="Wrap" Visibility="Collapsed">
                 Click on the following button to select your recording screen area.
             </TextBlock>
             <Button Height="50"
@@ -48,7 +48,7 @@
                     SnapsToDevicePixels="True"
                     IsEnabled="{Binding Path=IsRecordingAreaSelected, Converter={StaticResource InvertedBooleanConverter}}"
                     Command="{Binding Path=SelectRecordingAreaCommand}"
-                    Content="Recording Region">
+                    Content="Select Region">
                 <Button.Style>
                     <Style TargetType="Button" BasedOn="{StaticResource ScreenAreaButtonStyle}">
                         
