@@ -28,7 +28,7 @@ namespace FastCapt.Views
             InitializeComponent();
             Loaded += (sender, args) =>
             {
-                DataContext = new MainViewModel();
+                DataContext = Container.Current.GetExportedValue<MainViewModel>();
             };
         }
 

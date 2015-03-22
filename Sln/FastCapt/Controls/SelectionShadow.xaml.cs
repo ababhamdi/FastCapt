@@ -74,7 +74,7 @@ namespace FastCapt.Controls
             "IsSelecting",
             typeof(bool),
             typeof(SelectionShadow),
-            new FrameworkPropertyMetadata(BooleanBoxes.False,
+            new FrameworkPropertyMetadata(BooleanBoxes.True,
                 FrameworkPropertyMetadataOptions.None,
                 (o, args) =>
                 {

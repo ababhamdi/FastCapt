@@ -40,7 +40,46 @@
     <StartupObject>FastCapt.Program</StartupObject>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="DeltaCompressionDotNet">
+      <HintPath>..\packages\DeltaCompressionDotNet.1.0.0\lib\net45\DeltaCompressionDotNet.dll</HintPath>
+    </Reference>
+    <Reference Include="DeltaCompressionDotNet.MsDelta">
+      <HintPath>..\packages\DeltaCompressionDotNet.1.0.0\lib\net45\DeltaCompressionDotNet.MsDelta.dll</HintPath>
+    </Reference>
+    <Reference Include="DeltaCompressionDotNet.PatchApi">
+      <HintPath>..\packages\DeltaCompressionDotNet.1.0.0\lib\net45\DeltaCompressionDotNet.PatchApi.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="ICSharpCode.SharpZipLib">
+      <HintPath>..\packages\squirrel.windows.0.9.2.1\lib\Net45\ICSharpCode.SharpZipLib.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.Expression.Interactions, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="Microsoft.Web.XmlTransform">
+      <HintPath>..\packages\Microsoft.Web.Xdt.2.1.1\lib\net40\Microsoft.Web.XmlTransform.dll</HintPath>
+    </Reference>
+    <Reference Include="Mono.Cecil">
+      <HintPath>..\packages\Mono.Cecil.0.9.5.4\lib\net40\Mono.Cecil.dll</HintPath>
+    </Reference>
+    <Reference Include="Mono.Cecil.Mdb">
+      <HintPath>..\packages\Mono.Cecil.0.9.5.4\lib\net40\Mono.Cecil.Mdb.dll</HintPath>
+    </Reference>
+    <Reference Include="Mono.Cecil.Pdb">
+      <HintPath>..\packages\Mono.Cecil.0.9.5.4\lib\net40\Mono.Cecil.Pdb.dll</HintPath>
+    </Reference>
+    <Reference Include="Mono.Cecil.Rocks">
+      <HintPath>..\packages\Mono.Cecil.0.9.5.4\lib\net40\Mono.Cecil.Rocks.dll</HintPath>
+    </Reference>
+    <Reference Include="NuGet.Core, Version=2.8.50926.602, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\NuGet.Core.2.8.3\lib\net40-Client\NuGet.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Splat">
+      <HintPath>..\packages\Splat.1.5.1\lib\Net45\Splat.dll</HintPath>
+    </Reference>
+    <Reference Include="Squirrel">
+      <HintPath>..\packages\squirrel.windows.0.9.2.1\lib\Net45\Squirrel.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Data" />
@@ -66,9 +105,11 @@
     </ApplicationDefinition>
     <Compile Include="ApplicationModel\IApplication.cs" />
     <Compile Include="ApplicationModel\FastCaptApplication.cs" />
+    <Compile Include="Controls\AdornersElement.cs" />
     <Compile Include="Controls\AreaAdorner.xaml.cs">
       <DependentUpon>AreaAdorner.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Controls\BindingHelpers.cs" />
     <Compile Include="Controls\Core\BooleanBoxes.cs" />
     <Compile Include="Controls\Core\RoutedEventHelper.cs" />
     <Compile Include="Controls\DimensionsView.xaml.cs">
@@ -81,6 +122,7 @@
     <Compile Include="Controls\SelectionShadow.xaml.cs">
       <DependentUpon>SelectionShadow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Controls\SelectionShadowElement.cs" />
     <Compile Include="Controls\WindowCommands.cs" />
     <Compile Include="Converters\InvertedBooleanToVisibilityConverter.cs" />
     <Compile Include="Converters\InvertedBooleanConverter.cs" />
@@ -92,10 +134,13 @@
     <Compile Include="Interop\WS_EX.cs" />
     <Compile Include="Interop\WS.cs" />
     <Compile Include="Program.cs" />
+    <Compile Include="Services\Interfaces\IIdleService.cs" />
     <Compile Include="Services\Interfaces\IService.cs" />
     <Compile Include="Services\Interfaces\IStartupService.cs" />
     <Compile Include="Services\Interfaces\IScreenSelectorService.cs" />
+    <Compile Include="Services\Interfaces\IUpdateService.cs" />
     <Compile Include="Services\ScreenSelectorService.cs" />
+    <Compile Include="Services\UpdateService.cs" />
     <Compile Include="ViewModels\DialogManager.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
     <Page Include="Controls\AreaAdorner.xaml">
@@ -158,6 +203,7 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <None Include="app.config" />
+    <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

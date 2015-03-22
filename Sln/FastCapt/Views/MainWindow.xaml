@@ -2,13 +2,32 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:ct="clr-namespace:FastCapt.Converters"
+        xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+        xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"
         Title="{Binding Path=Title}"
         ResizeMode="CanMinimize"
         Height="280"
         Width="240"
         Background="#42464F"
         Foreground="White"
-        Style="{StaticResource MainWindowStyle}">
+        x:Name="RootWindow">
+
+    <Window.Style>
+        <Style TargetType="Window" BasedOn="{StaticResource MainWindowStyle}">
+            <Style.Triggers>
+                <Trigger Property="WindowState" Value="Normal" />
+            </Style.Triggers>
+        </Style>
+    </Window.Style>
+    
+    <i:Interaction.Triggers>
+        <ei:DataTrigger Binding="{Binding ElementName=RootWindow, Path=WindowState}" Value="{x:Static WindowState.Normal}" Comparison="Equal">
+            <ei:CallMethodAction TargetObject="{Binding}" MethodName="OnMainWindowRestored" />
+        </ei:DataTrigger>
+        <ei:DataTrigger Binding="{Binding ElementName=RootWindow, Path=WindowState}" Value="{x:Static WindowState.Minimized}" Comparison="Equal">
+            <ei:CallMethodAction TargetObject="{Binding}" MethodName="OnMainWindowMinimized" />
+        </ei:DataTrigger>
+    </i:Interaction.Triggers>
     
     <Window.Resources>
         <ct:InvertedBooleanConverter x:Key="InvertedBooleanConverter" />

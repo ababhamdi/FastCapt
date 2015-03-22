@@ -44,7 +44,19 @@ namespace FastCapt.Controls
             "RecordingRect",
             typeof(Rect),
             typeof(AreaAdorner),
-            new FrameworkPropertyMetadata(Rect.Empty, FrameworkPropertyMetadataOptions.None));
+            new FrameworkPropertyMetadata(Rect.Empty,
+                FrameworkPropertyMetadataOptions.None,
+                (o, args) =>
+                {
+                    var areaAdorner = (AreaAdorner) o;
+                    var newRect = (Rect) args.NewValue;
+
+                    // each time the recording rect changes, we update adorner canvas placement.
+                    Canvas.SetLeft(areaAdorner, newRect.Left);
+                    Canvas.SetTop(areaAdorner, newRect.Top);
+                    areaAdorner.Width = newRect.Width;
+                    areaAdorner.Height = newRect.Height;
+                }));
 
         /// <summary>
         /// Gets or sets the RecordingRect property. This is a dependency property.
@@ -161,25 +173,18 @@ namespace FastCapt.Controls
                 handled = true;
                 rect.Width += horizontalChange*-1;
                 rect.X += horizontalChange;
-
-                Width += horizontalChange*-1;
-
-                var left = Canvas.GetLeft(this);
-                Canvas.SetLeft(this, left + horizontalChange);
             }
 
             if ((Dock.Right & direction) == Dock.Right)
             {
                 handled = true;
                 rect.Width += horizontalChange;
-                Width += horizontalChange;
             }
 
             if ((Dock.Bottom & direction) == Dock.Bottom)
             {
                 handled = true;
                 rect.Height += verticalChange;
-                Height += verticalChange;
             }
 
             if ((Dock.Top & direction) == Dock.Top)
@@ -187,10 +192,6 @@ namespace FastCapt.Controls
                 handled = true;
                 rect.Height += verticalChange * -1;
                 rect.Y += verticalChange;
-
-                Height += verticalChange * -1;
-                var top = Canvas.GetTop(this);
-                Canvas.SetTop(this, top + verticalChange);
             }
 
             if (!handled)
@@ -199,24 +200,6 @@ namespace FastCapt.Controls
                 var mousePos = Mouse.GetPosition(null);
                 var currentScreen = Screen.FromPoint(new System.Drawing.Point((int)mousePos.X, (int)mousePos.Y));
                 var screenBounds = currentScreen.Bounds;
-
-                var top = Canvas.GetTop(this);
-                var newTop = top+verticalChange;
-
-                if (newTop < screenBounds.Top)
-                    newTop = screenBounds.Top;
-                else if ((newTop + rect.Height) > screenBounds.Bottom)
-                    newTop = screenBounds.Bottom - rect.Height;
-                Canvas.SetTop(this, newTop);
-
-                // check the left side of the rect
-                var left = Canvas.GetLeft(this);
-                var newLeft = left + horizontalChange;
-                if (newLeft < screenBounds.Left)
-                    newLeft = screenBounds.Left;
-                else if ((newLeft + rect.Width) > screenBounds.Right)
-                    newLeft = screenBounds.Right - rect.Width;
-                Canvas.SetLeft(this, newLeft);
 
                 // check the right edge of the screen
                 var newX = rect.X + horizontalChange;

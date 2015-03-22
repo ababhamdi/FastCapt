@@ -50,6 +50,37 @@
                     </Setter.Value>
                 </Setter>
             </Style>
+            
+            <Style x:Key="AreaAdornersCloseButtonStyle" TargetType="Button">
+                <Setter Property="OverridesDefaultStyle" Value="True" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Button">
+                            <Grid>
+                                <Ellipse x:Name="Ellipse" Width="16" Height="16" Fill="#FF8080" />
+                                <Path Fill="#75633D"
+                                      x:Name="x_mark_icon"
+                                      VerticalAlignment="Center"
+                                      HorizontalAlignment="Center"
+                                      Width="9"
+                                      Height="9"
+                                      Stretch="Fill">
+                                    <Path.Data>
+                                        <PathGeometry FillRule="Nonzero" 
+                                                      Figures="M438.393,374.595L319.757,255.977 438.378,137.348 374.595,73.607 255.995,192.225 137.375,73.622 73.607,137.352 192.246,255.983 73.622,374.625 137.352,438.393 256.002,319.734 374.652,438.378z" />
+                                    </Path.Data>
+                                </Path>
+                            </Grid>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="x_mark_icon" Property="Fill" Value="White" />
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+            
         </ResourceDictionary>
     </UserControl.Resources>
 	<UserControl.Visibility>
@@ -140,5 +171,11 @@
                                                    Path=IsResizing,
                                                    Converter={StaticResource BooleanToVisibilityConverter}}"
                               DataContext="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=lc:AreaAdorner}, Path=RecordingRect}"/>
+        
+        <Button VerticalAlignment="Top"
+                HorizontalAlignment="Right"
+                Margin="10"
+                Command="{Binding Path=CloseCommand}"
+                Style="{StaticResource AreaAdornersCloseButtonStyle}" />
     </Grid>
 </UserControl>
