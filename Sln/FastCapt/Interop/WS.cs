@@ -1,5 +1,8 @@
-﻿namespace FastCapt.Interop
+﻿using System;
+
+namespace FastCapt.Interop
 {
+    [Flags]
     public enum WS
     {
         OVERLAPPED = 0x00000000,

@@ -1,0 +1,1 @@
+msbuild '.\Sln\Build.build' /property:Configuration=Release

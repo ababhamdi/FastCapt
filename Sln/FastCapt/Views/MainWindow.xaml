@@ -6,7 +6,7 @@
         xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"
         Title="{Binding Path=Title}"
         ResizeMode="CanMinimize"
-        Height="220"
+        Height="200"
         Width="150"
         Background="#42464F"
         Foreground="White"

@@ -58,7 +58,7 @@ namespace FastCapt.Controls
                 UsesPerPixelOpacity = true,
                 PositionX = 0,
                 PositionY = 0,
-                WindowStyle = (int)(WS.POPUP),
+                WindowStyle = (int)(WS.POPUP | WS.VISIBLE | WS.CLIPCHILDREN | WS.CLIPSIBLINGS),
                 ExtendedWindowStyle = (int)(WS_EX.TOPMOST | WS_EX.NOPARENTNOTIFY | WS_EX.TOOLWINDOW),
             };
 

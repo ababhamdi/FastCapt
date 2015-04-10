@@ -1,0 +1,50 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003"
+         ToolsVersion="4.0"
+         DefaultTargets="BuildSetup">
+
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == ''">Debug</Configuration>
+    <DllIncludeFilter>**\*.dll</DllIncludeFilter>
+    <ExeIncludeFilter>**\*.exe</ExeIncludeFilter>
+    <ConfigIncludeFilter>**\*.config</ConfigIncludeFilter>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <TempFolder Include="..\__squirrel_temp__" />
+    <SolutionFile Include=".\Sln.sln" />
+    <Nuget Include="..\Tools\nuget\nuget.exe" />
+    <SpecFile Include=".\Package.nuspec" />
+    <PackageDir Include="..\__squirrel_temp__\Package" />
+    <DestSpecFile Include="..\__squirrel_temp__\Package\Package.nuspec" />
+  </ItemGroup>
+
+  <Target Name="Clean">
+    <RemoveDir Directories="@(TempFolder)" />
+  </Target>
+
+  <Target Name="Init" DependsOnTargets="Clean">
+    <MakeDir Directories="@(TempFolder)" />
+  </Target>
+
+  <Target Name="Compile" DependsOnTargets="Init">
+    <MSBuild Projects="@(SolutionFile)"
+             Targets="Rebuild" Properties="OutDir=%(TempFolder.FullPath);Configuration=$(Configuration)" />
+  </Target>
+
+  <Target Name="BuildSetup" DependsOnTargets="Compile">
+
+    <CreateItem Include="%(TempFolder.FullPath)\$(DllIncludeFilter);%(TempFolder.FullPath)\$(ExeIncludeFilter);%(TempFolder.FullPath)\$(ConfigIncludeFilter)" >
+      <Output ItemName="AllDlls" TaskParameter="Include"/>
+    </CreateItem>
+    
+    <Message Text="Running Nuget" />
+    <MakeDir Directories="@(PackageDir)" />
+    <Copy SourceFiles="%(SpecFile.FullPath)" DestinationFolder="@(PackageDir)" />
+    <MakeDir Directories="%(PackageDir.FullPath)\Lib\net45" />
+    <Copy SourceFiles="@(AllDlls)" DestinationFolder="%(PackageDir.FullPath)\Lib\net45" />
+    <Exec Command="%(Nuget.FullPath) pack &quot;@(DestSpecFile)&quot; -OutputDirectory &quot;@(PackageDir)&quot; -NoPackageAnalysis" />
+    <Message Text="Done Running Nuget" />
+  </Target>
+
+</Project>

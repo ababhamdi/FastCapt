@@ -1,6 +1,5 @@
-﻿using System;
-using System.Windows;
-using System.Windows.Interop;
+﻿using System.Windows;
+using Squirrel;
 
 namespace FastCapt
 {
@@ -12,13 +11,13 @@ namespace FastCapt
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
-
-            ComponentDispatcher.ThreadIdle += OnThreadIdle;
+            UpdateApplication();
         }
 
-        private void OnThreadIdle(object sender, EventArgs e)
+        private async void UpdateApplication()
         {
-            
+            var updateManager = Container.Current.GetExportedValue<IUpdateManager>();
+            await updateManager.UpdateApp();
         }
     }
 }
